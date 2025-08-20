@@ -1,0 +1,29 @@
+{
+  "name": "books-shop",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.4",
+    "hono": "^4.9.2",
+    "ioredis": "^5.7.0",
+    "pg": "^8.16.3",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.11",
+    "@types/pg": "^8.15.5",
+    "@types/redis": "^4.0.10",
+    "drizzle-kit": "^0.31.4",
+    "eslint": "^9.33.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.4",
+    "typescript": "^5.8.3"
+  }
+}
