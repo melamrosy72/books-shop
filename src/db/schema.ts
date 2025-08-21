@@ -1,14 +1,14 @@
 import { relations } from "drizzle-orm";
-import { decimal, integer, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { decimal, index, integer, pgTable, primaryKey, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
-
+// ------------------------Tables------------------------
 
 // Users
 export const users = pgTable('users', {
     id: serial('id').primaryKey(),
-    username: varchar('username', { length: 100 }).notNull().unique(),
+    username: varchar('username', { length: 30 }).notNull().unique(),
     email: varchar('email', { length: 100 }).notNull().unique(),
-    password: varchar('password', { length: 100 }).notNull(),
+    password: varchar('password', { length: 255 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -40,25 +40,66 @@ export const books = pgTable('books', {
     description: text('description'),
     price: decimal('price', { precision: 10, scale: 2 }).notNull(),
     thumbnail: text('thumbnail'),
-    categoryId: integer('category_id').references(() => categories.id).notNull(),
-    authorId: integer('author_id').references(() => authors.id).notNull(),
-    ownerId: integer('owner_id').references(() => users.id).notNull(),
+    categoryId: integer('category_id').references(() => categories.id, { onDelete: 'no action' }).notNull(),
+    authorId: integer('author_id').references(() => authors.id, { onDelete: 'set null' }),
+    ownerId: integer('owner_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
-});
-
+},
+    (t) => [
+        index('idx_books_category_id').on(t.categoryId),
+        index('idx_books_owner_id').on(t.ownerId),
+    ]
+);
 
 // Books to Tags (Many-to-Many)
 export const booksToTags = pgTable('books_to_tags', {
-    id: serial('id').primaryKey(),
-    bookId: integer('book_id').references(() => books.id).notNull(),
-    tagId: integer('tag_id').references(() => tags.id).notNull(),
-});
+    bookId: integer('book_id').references(() => books.id, { onDelete: 'cascade' }).notNull(),
+    tagId: integer('tag_id').references(() => tags.id, { onDelete: 'cascade' }).notNull(),
+},
+    (t) => [
+        primaryKey({ columns: [t.bookId, t.tagId] }),
+        index('idx_books_to_tags_tag_id').on(t.tagId)
+    ]
+);
 
-// User Has Man Books (One-to-Many)
+
+
+
+// ------------------------Relations-------------------------
+
+// Category Relation (One-to-Many)
+export const categoriesRelations = relations(categories, ({ many }) => ({
+    books: many(books),
+}));
+
+// Author Relation (One-to-Many)
+export const authorsRelations = relations(authors, ({ many }) => ({
+    books: many(books),
+}));
+
+// User Relation (One-to-Many)
 export const usersRelations = relations(users, ({ many }) => ({
     books: many(books),
 }));
+
+// Tag Relation (Many-to-Many)
+export const tagsRelations = relations(tags, ({ many }) => ({
+    booksToTags: many(booksToTags),
+}));
+
+// Pivot table relations
+export const booksToTagsRelations = relations(booksToTags, ({ one }) => ({
+    book: one(books, {
+        fields: [booksToTags.bookId],
+        references: [books.id],
+    }),
+    tag: one(tags, {
+        fields: [booksToTags.tagId],
+        references: [tags.id],
+    }),
+}));
+
 
 // Book Relations
 export const booksRelations = relations(books, ({ one, many }) => ({
@@ -66,7 +107,7 @@ export const booksRelations = relations(books, ({ one, many }) => ({
         fields: [books.categoryId],
         references: [categories.id],
     }),
-    users: one(users, {
+    owner: one(users, {
         fields: [books.ownerId],
         references: [users.id]
     }),
@@ -74,5 +115,5 @@ export const booksRelations = relations(books, ({ one, many }) => ({
         fields: [books.authorId],
         references: [authors.id]
     }),
-    tags: many(booksToTags)
+    tags: many(booksToTags),
 }))
