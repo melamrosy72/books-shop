@@ -8,8 +8,8 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-    login: z.string().max(100).nonempty('username or email is required'),
-    password: z.string().max(255).nonempty('password is required'),
+    login: z.string("username or email is required").max(100).min(1, "username or email is required"),
+    password: z.string('password is required ').max(255).min(1, "password is required"),
 });
 
 export const updateProfileSchema = z.object({

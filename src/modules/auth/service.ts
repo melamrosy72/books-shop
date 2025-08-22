@@ -23,16 +23,28 @@ export const registerUser = async (data: RegisterInput) => {
         updatedAt: users.updatedAt,
     })
 
-    return { user }
-}
-
-
-export const findUserByEmailOrUsername = async (email: string, username: string = '') => {
-    const user = await db.query.users.findFirst({
-        where: or(eq(users.email, email), eq(users.username, username)),
-    })
     return user
 }
+
+export const findUserByEmailOrUsername = async ({
+    email,
+    username,
+}: {
+    email?: string;
+    username?: string;
+}) => {
+    if (!email && !username) {
+        throw new ClientError("Must provide email or username");
+    }
+
+    const conditions = [];
+    if (email) conditions.push(eq(users.email, email));
+    if (username) conditions.push(eq(users.username, username));
+    const user = await db.query.users.findFirst({
+        where: or(...conditions),
+    });
+    return user;
+};
 
 export const findUserById = async (userId: number) => {
     return db.query.users.findFirst({
@@ -43,13 +55,7 @@ export const findUserById = async (userId: number) => {
     });
 };
 
-export const findUser = async (filters: SQL[] = []) => {
-    return db.select().from(users).where(and(...filters))
-}
-
-
 export const forgotPassword = async (email: string) => {
-
     // check user existence
     const existingUser = await db.query.users.findFirst({
         where: eq(users.email, email)
@@ -65,8 +71,6 @@ export const forgotPassword = async (email: string) => {
 }
 
 export const resetPassword = async (data: resetPasswordInput) => {
-
-
     // check user existence
     const existingUser = await db.query.users.findFirst({
         where:
@@ -94,7 +98,3 @@ export const resetPassword = async (data: resetPasswordInput) => {
         )
 
 }
-
-// export const logoutUser = async (token: string) => {
-//     await redis.del(token)
-// }

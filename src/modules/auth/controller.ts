@@ -1,7 +1,6 @@
 import { type Context } from "hono"
 import * as authService from "./service.js"
 import { forgetPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "./validation.js"
-import z from "zod";
 import { failureResponse, successResponse } from "../../utils/response.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtService.js";
 import { comparePassword } from "../../utils/bcryptService.js";
@@ -12,15 +11,20 @@ export const register = async (c: Context) => {
     // validating req data
     const validatedData = registerSchema.parse(body)
     // check user existence
-    const existingUser = await authService.findUserByEmailOrUsername(validatedData.email, validatedData.username)
+    const existingUser = await authService.findUserByEmailOrUsername(
+        {
+            email: validatedData.email,
+            username: validatedData.username
+        }
+    )
     if (existingUser) {
         return c.json({ success: false, error: 'User already exists' }, 409);
     }
     // create user
     const user = await authService.registerUser(validatedData)
     // create token
-    const accessToken = generateAccessToken(user.user.id);
-    const refreshToken = generateRefreshToken(user.user.id);
+    const accessToken = generateAccessToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
 
     return c.json({ success: true, accessToken, refreshToken }, 201)
 
@@ -28,10 +32,15 @@ export const register = async (c: Context) => {
 
 export const login = async (c: Context) => {
     const body = await c.req.json();
+    console.log(body);
+
     const validatedData = loginSchema.parse(body);
 
     // Find user
-    const user = await authService.findUserByEmailOrUsername(validatedData.login, validatedData.login);
+    const user = await authService.findUserByEmailOrUsername({
+        email: validatedData.login,
+        username: validatedData.login
+    });
     if (!user) {
         return c.json({ success: false, error: 'Invalid credentials' }, 401);
     }
