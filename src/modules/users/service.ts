@@ -15,13 +15,15 @@ export const getUserById = async (id: number) => {
     })
 }
 
-
 export const updateUser = async (id: number, data: UpdateProfileInput) => {
 
     // Check Email Existence
     if (data.email) {
         const existingEmail = await db.query.users.findFirst({
-            where: and(eq(users.email, data.email), not(eq(users.id, id)))
+            where: and(
+                eq(users.email, data.email),
+                not(eq(users.id, id))   // exclude current user
+            )
         })
         if (existingEmail) throw new ClientError("Email already exists", 409)
     }
@@ -29,7 +31,10 @@ export const updateUser = async (id: number, data: UpdateProfileInput) => {
     // Check Username Existence
     if (data.username) {
         const existingUsername = await db.query.users.findFirst({
-            where: and(eq(users.username, data.username), not(eq(users.id, id)))
+            where: and(
+                eq(users.username, data.username),
+                not(eq(users.id, id)) // exclude current user 
+            )
         })
         if (existingUsername) throw new ClientError("Username already exists", 409)
     }
@@ -44,6 +49,7 @@ export const updateUser = async (id: number, data: UpdateProfileInput) => {
         throw new ClientError("No valid fields to update", 400);
     }
 
+    updateData.updatedAt = new Date();
     // Update user
     const [updatedUser] = await db.update(users)
         .set(updateData)
@@ -61,6 +67,7 @@ export const updateUser = async (id: number, data: UpdateProfileInput) => {
 
 export const changePassword = async (id: number, data: ChangePasswordInput) => {
     return await db.update(users).set({
-        password: await hashPassword(data.newPassword)
+        password: await hashPassword(data.newPassword),
+        updatedAt: new Date()
     }).where(eq(users.id, id))
 }

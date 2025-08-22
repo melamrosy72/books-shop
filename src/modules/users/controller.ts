@@ -11,21 +11,21 @@ import { changePasswordSchema, updateProfileSchema } from "./validation.js";
 export const getProfile = async (c: Context) => {
     const userId = c.get('user').id
     const user = await usersService.getUserById(userId)
-    if (!user) return c.json({ success: false, error: "User not found" }, 404)
+    if (!user) return failureResponse(c, "User not found", 404)
     const { password, ...userWithoutPassword } = user
-    return c.json({ success: true, data: userWithoutPassword })
+    return successResponse(c, userWithoutPassword)
 }
 
 
-//editProfile : basic details
+//  EditProfile : only email & username for this case
 export const editProfile = async (c: Context) => {
     const userId = c.get('user').id
     const body = await c.req.json()
     const validatedData = updateProfileSchema.parse(body)
     const user = await usersService.getUserById(userId)
-    if (!user) return c.json({ success: false, error: "User not found" }, 404)
+    if (!user) return failureResponse(c, "User not found", 404)
     const updatedUser = await usersService.updateUser(userId, validatedData)
-    return c.json({ success: true, data: updatedUser })
+    return successResponse(c, updatedUser)
 }
 
 
@@ -35,10 +35,10 @@ export const changePassword = async (c: Context) => {
     const body = await c.req.json()
     const validatedData = changePasswordSchema.parse(body)
     const user = await usersService.getUserById(userId)
-    if (!user) return c.json({ success: false, error: "User not found" }, 404)
+    if (!user) return failureResponse(c, "User not found", 404)
     // check old password
     const isValidPassword = await comparePassword(validatedData.oldPassword, user.password)
-    if (!isValidPassword) return c.json({ success: false, error: "old password is not valid" }, 401)
+    if (!isValidPassword) return failureResponse(c, "old password is not valid", 401)
     // update password
     await usersService.changePassword(userId, validatedData)
     return c.json({ success: true, message: 'Password Has Been Changed Successfully' })

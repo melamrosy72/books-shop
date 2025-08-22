@@ -5,6 +5,7 @@ import { email, z } from 'zod';
 export const updateProfileSchema = z.object({
     username: z.string().min(3, 'Username must be at least 3 characters').optional(),
     email: z.email('Invalid email address').optional(),
+    updatedAt: z.date().optional()
 }).refine((data) => data.username || data.email, {
     message: 'No Data Has Been Provided for Update',
     path: ['username', 'email'],
