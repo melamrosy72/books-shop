@@ -25,10 +25,10 @@ app.onError((err: Error, c: Context) => {
         const messages = err.issues.map((issue) => issue.message);
         return c.json({ success: false, errors: messages }, 400);
     }
+    if (err instanceof SyntaxError && err.message.includes('JSON')) {
+        return c.json({ error: 'Invalid JSON format'}, 400);
+    }
     return c.json({ error: err.message }, 500)
-    // if (err instanceof SyntaxError && err.message.includes('JSON')) {
-    //     return c.json({ error: 'Invalid JSON format' }, 400);
-    // }
 })
 // Start server in Node
 const port = 3000

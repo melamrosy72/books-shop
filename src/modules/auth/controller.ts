@@ -3,8 +3,9 @@ import * as authService from "./service.js"
 import { forgetPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "./validation.js"
 import z from "zod";
 import { failureResponse, successResponse } from "../../utils/response.js";
-import { generateToken } from "../../utils/jwtService.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtService.js";
 import { comparePassword } from "../../utils/bcryptService.js";
+import redis from "../../config/redis.js";
 
 export const register = async (c: Context) => {
     const body = await c.req.json()
@@ -18,9 +19,10 @@ export const register = async (c: Context) => {
     // create user
     const user = await authService.registerUser(validatedData)
     // create token
-    const token = generateToken(user.user.id)
+    const accessToken = generateAccessToken(user.user.id);
+    const refreshToken = generateRefreshToken(user.user.id);
 
-    return c.json({ success: true, token }, 201)
+    return c.json({ success: true, accessToken, refreshToken }, 201)
 
 }
 
@@ -44,18 +46,18 @@ export const login = async (c: Context) => {
         return c.json({ success: false, error: 'Invalid credentials' }, 401);
     }
 
-    // Generate token
-    const token = generateToken(user.id);
+    // Generate tokens
+    const accessToken = generateAccessToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
 
-    // Remove password from response
-    const { password, ...userWithoutPassword } = user;
+    // Store refresh token in Redis for 7 days
+    await redis.set(`refresh:${user.id}`, refreshToken, "EX", 7 * 24 * 60 * 60);
 
     return c.json({
-        success: true,
-        data: {
-            user: userWithoutPassword,
-            token,
-        },
+        username: user.username,
+        accessToken,
+        refreshToken,
+
     });
 
 };
@@ -81,6 +83,42 @@ export const resetPassword = async (c: Context) => {
 
 
 export const logout = async (c: Context) => {
-    // handle logout logic
-    console.log('logged out!')
+    const { refreshToken } = await c.req.json();
+
+    const decoded: any = verifyRefreshToken(refreshToken);
+    await redis.del(`refresh:${decoded.userId}`);
+
+    return c.json({ success: true, message: "Logged out" });
+};
+
+
+
+export const refresh = async (c: Context) => {
+
+    const { refreshToken } = await c.req.json();
+
+    try {
+        const decoded: any = verifyRefreshToken(refreshToken);
+        // Check in Redis
+        const storedToken = await redis.get(`refresh:${decoded.userId}`);
+
+        if (storedToken !== refreshToken) {
+            return c.json({ success: false, error: "Invalid refresh token" }, 401);
+        }
+
+        // Generate new tokens
+        const newAccessToken = generateAccessToken(decoded.userId);
+        const newRefreshToken = generateRefreshToken(decoded.userId);
+
+        // Update Redis with new refresh token (rotate)
+        await redis.set(`refresh:${decoded.userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60);
+
+        return c.json({
+            success: true,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+        });
+    } catch (err) {
+        return c.json({ success: false, error: "Invalid refresh token" }, 401);
+    }
 };

@@ -25,7 +25,11 @@ export const resetPasswordSchema = z.object({
     email: z.email('Invalid email address').nonempty('Email is Required').max(100, 'email must be maximum 100 characters'),
     otp: z.string().length(6, 'OTP must be 6 characters length').nonempty('OTP is Required'),
     newPassword: z.string().min(6, 'Password must be at least 6 characters').nonempty('Password is Required'),
-})
+    confirmPassword: z.string().min(6, { message: 'Confirm password must be at least 6 characters' }).nonempty('Password is Required'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+});
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
