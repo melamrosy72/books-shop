@@ -92,12 +92,9 @@ export const resetPassword = async (c: Context) => {
 
 
 export const logout = async (c: Context) => {
-    const { refreshToken } = await c.req.json();
-
-    const decoded: any = verifyRefreshToken(refreshToken);
-    await redis.del(`refresh:${decoded.userId}`);
-
-    return c.json({ success: true, message: "Logged out" });
+    const userId = c.get('user').id
+    await redis.del(`refresh:${userId}`);
+    return c.json({ success: true, message: "Logged out Successfully" });
 };
 
 
