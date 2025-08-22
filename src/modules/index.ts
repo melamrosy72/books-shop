@@ -1,11 +1,13 @@
 import { authRoutes } from './auth/routes.js'
 import { usersRoutes } from './users/routes.js'
+import { booksRoutes } from './books/routes.js'
 
-// import all routes here
+// TODO : import all routes here
 
 
 export const routes = {
     auth: authRoutes,
-    users: usersRoutes
-    //export all
+    users: usersRoutes,
+    books: booksRoutes
+
 }

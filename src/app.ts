@@ -14,6 +14,7 @@ app.use('*', logger())
 // Routes
 app.route('/api/v1/auth', routes.auth)
 app.route('/api/v1/users', routes.users)
+app.route('/api/v1/books', routes.books)
 
 
 app.get('/', (c: Context) => c.json({ status: 'success', message: 'Books Shop API is running 🚀' }))
