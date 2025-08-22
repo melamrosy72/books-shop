@@ -6,7 +6,7 @@ export const successResponse = (c: Context, data: any, status: StatusCode = 200)
     return c.json({ success: true, data }, status);
 };
 
-export const failureResponse = (c: Context, message: string, status: StatusCode = 500) => {
+export const failureResponse = (c: Context, message: string, status: StatusCode = 400) => {
     return c.json({ success: false, error: message }, status);
 };
 

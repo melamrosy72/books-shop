@@ -13,6 +13,8 @@ app.use('*', logger())
 
 // Routes
 app.route('/api/v1/auth', routes.auth)
+app.route('/api/v1/users', routes.users)
+
 
 app.get('/', (c: Context) => c.json({ status: 'success', message: 'Books Shop API is running 🚀' }))
 
@@ -26,7 +28,7 @@ app.onError((err: Error, c: Context) => {
         return c.json({ success: false, errors: messages }, 400);
     }
     if (err instanceof SyntaxError && err.message.includes('JSON')) {
-        return c.json({ error: 'Invalid JSON format'}, 400);
+        return c.json({ error: 'Invalid JSON format' }, 400);
     }
     return c.json({ error: err.message }, 500)
 })
