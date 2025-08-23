@@ -39,7 +39,7 @@ export const books = pgTable('books', {
     id: serial('id').primaryKey(),
     title: varchar('title', { length: 250 }).notNull(),
     description: text('description'),
-    price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+    price: integer('price').notNull(),
     thumbnail: text('thumbnail'),
     categoryId: integer('category_id').references(() => categories.id, { onDelete: 'no action' }).notNull(),
     authorId: integer('author_id').references(() => authors.id, { onDelete: 'set null' }),

@@ -1,12 +1,12 @@
 // src/modules/authors/service.ts
 import { db } from "../../db/index.js";
-import { authors, categories, tags } from "../../db/schema.js";
-import { eq } from "drizzle-orm";
+import { authors, books, booksToTags, categories, tags } from "../../db/schema.js";
+import { and, asc, between, desc, eq, gt, gte, ilike, lt, lte, SQL, sql } from "drizzle-orm";
 import { ClientError } from "../../utils/errorHandler.js";
-import type { CreateAuthorInput, CreateCategoryInput, CreateTagInput } from "./validation.js";
-
+import type { BookQueryInput, CreateAuthorInput, CreateBookInput, CreateCategoryInput, CreateTagInput } from "./validation.js";
 
 //                                  ====== Categories =====
+// Create Category
 export const createCategory = async (data: CreateCategoryInput) => {
     const existing = await db.query.categories.findFirst({
         where: eq(categories.name, data.name),
@@ -22,6 +22,7 @@ export const getCategories = async () => {
 };
 
 //                                  ====== Authors =====
+
 // Create Author
 export const createAuthor = async (data: CreateAuthorInput) => {
     const existing = await db.query.authors.findFirst({
@@ -39,7 +40,7 @@ export const getAuthors = async () => {
 
 
 //                                  ====== Tags =====
-// Create Author
+// Create Tag
 export const createTag = async (data: CreateTagInput) => {
     const existing = await db.query.tags.findFirst({
         where: eq(tags.name, data.name),
@@ -48,8 +49,7 @@ export const createTag = async (data: CreateTagInput) => {
     const [tag] = await db.insert(tags).values(data).returning();
     return tag;
 };
-
-// Get all Authors
+// Get all Tags
 export const getTags = async () => {
     return await db.select().from(tags);
 };
@@ -57,3 +57,122 @@ export const getTags = async () => {
 
 
 //                                  ====== Books =====
+// Create Book
+export const createBook = async (userId: number, data: CreateBookInput) => {
+    const [book] = await db.insert(books).values({
+        ...data,
+        ownerId: userId,
+    }).returning();
+
+    if (data.tags && data.tags.length > 0) {
+        const tagsData = data.tags.map((tagId: number) => ({
+            bookId: book.id,
+            tagId,
+        }))
+        await db.insert(booksToTags).values(tagsData);
+    }
+    return book;
+};
+
+// Get Book By Id
+export const getBookById = async (id: number) => {
+    const [book] = await db
+        .select({
+            id: books.id,
+            title: books.title,
+            description: books.description,
+            price: books.price,
+            thumbnail: books.thumbnail,
+            author: { id: authors.id, name: authors.name },
+            category: { id: categories.id, name: categories.name },
+            tags: sql`json_agg(json_build_object('id', ${tags.id}, 'name', ${tags.name}))`.as("tags"),
+        })
+        .from(books)
+        .innerJoin(categories, eq(categories.id, books.categoryId))
+        .innerJoin(authors, eq(authors.id, books.authorId))
+        .leftJoin(booksToTags, eq(booksToTags.bookId, books.id))
+        .leftJoin(tags, eq(tags.id, booksToTags.tagId))
+        .where(eq(books.id, id))
+        .groupBy(books.id, authors.id, categories.id)
+
+    return book;
+};
+
+// Get Books
+export const getBooks = async (query: BookQueryInput) => {
+    const { search, sort, paginated = false, categoryId, ownerId } = query;
+    const page = query.page ? Number(query.page) : 1;
+    const limit = query.limit ? Number(query.limit) : 25;
+
+    const min = query.minPrice ? Number(query.minPrice) : undefined;
+    const max = query.maxPrice ? Number(query.maxPrice) : undefined;
+
+    const orderBy = sort === "desc" ? desc(books.title) : asc(books.title);
+
+    let whereClause;
+
+    if (search) {
+        whereClause = and(whereClause, ilike(books.title, `%${search}%`));
+    }
+    if (min !== undefined && max !== undefined) {
+        whereClause = and(whereClause, between(books.price, min, max));
+    } else if (min !== undefined) {
+        whereClause = and(whereClause, gte(books.price, min));
+    } else if (max !== undefined) {
+        whereClause = and(whereClause, lte(books.price, max));
+    }
+
+    if (categoryId) {
+        whereClause = and(whereClause, eq(books.categoryId, categoryId));
+    }
+    if (ownerId) {
+        whereClause = and(whereClause, eq(books.ownerId, ownerId));
+    }
+    const docs = await db
+        .select({
+            id: books.id,
+            title: books.title,
+            price: books.price,
+            thumbnail: books.thumbnail,
+            author: { id: authors.id, name: authors.name },
+            category: { id: categories.id, name: categories.name },
+            tags: sql`
+                json_agg(json_build_object('id', ${tags.id}, 'name', ${tags.name}))
+                FILTER (WHERE ${tags.id} IS NOT NULL)
+            `.as("tags"),
+        })
+        .from(books)
+        .innerJoin(categories, eq(categories.id, books.categoryId))
+        .innerJoin(authors, eq(authors.id, books.authorId))
+        .leftJoin(booksToTags, eq(booksToTags.bookId, books.id))
+        .leftJoin(tags, eq(tags.id, booksToTags.tagId))
+        .where(whereClause)
+        .groupBy(books.id, authors.id, categories.id)
+        .orderBy(orderBy)
+        .limit(limit)
+        .offset((page - 1) * limit);
+
+    const [totalDocs] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(books)
+        .where(whereClause);
+
+    const totalCount = Number(totalDocs.count);
+
+    return paginated
+        ? {
+            docs,
+            totalDocs: totalCount,
+            limit,
+            page,
+            totalPages: Math.ceil(totalCount / limit),
+        }
+        : {
+            docs,
+            totalDocs: totalCount,
+        };
+};
+
+export const deleteBook = async (id: number) => {
+    await db.delete(books).where(eq(books.id, id));
+}

@@ -25,12 +25,15 @@ app.onError((err: Error, c: Context) => {
         return c.json({ error: err.message }, 400);
     }
     if (err instanceof z.ZodError) {
-        const messages = err.issues.map((issue) => issue.message);
+        // const messages = err.issues.map((issue) => issue.message);
+        const messages = err.issues;
         return c.json({ success: false, errors: messages }, 400);
     }
     if (err instanceof SyntaxError && err.message.includes('JSON')) {
         return c.json({ error: 'Invalid JSON format' }, 400);
     }
+    console.log(err);
+
     return c.json({ error: err.message }, 500)
 })
 // Start server in Node

@@ -15,6 +15,13 @@
       "when": 1755832136568,
       "tag": "0001_steep_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755961782545,
+      "tag": "0002_absent_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

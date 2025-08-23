@@ -1,10 +1,7 @@
 import { type Context } from "hono"
 import * as booksService from "./service.js"
 import { failureResponse, successResponse } from "../../utils/response.js";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtService.js";
-import { comparePassword } from "../../utils/bcryptService.js";
-import redis from "../../config/redis.js";
-import { createAuthorSchema, createCategorySchema, createTagSchema } from "./validation.js";
+import { bookQuerySchema, createAuthorSchema, createBookSchema, createCategorySchema, createTagSchema, } from "./validation.js";
 
 
 
@@ -47,3 +44,43 @@ export const getTags = async (c: Context) => {
     const tags = await booksService.getTags();
     return successResponse(c, tags);
 };
+
+
+
+// ================= Books =================
+export const createBook = async (c: Context) => {
+    const body = await c.req.json();
+    const validatedData = createBookSchema.parse(body);
+    const userId = c.get("user").id;
+    const book = await booksService.createBook(userId, validatedData);
+    return successResponse(c, book, 201);
+};
+
+export const getBookById = async (c: Context) => {
+    const bookId = parseInt(c.req.param("bookId"));
+    const book = await booksService.getBookById(bookId);
+    if (!book) return failureResponse(c, "Book not found", 404);
+    return successResponse(c, book);
+};
+
+export const getAllBooks = async (c: Context) => {
+    const query = bookQuerySchema.parse(c.req.query());
+    const books = await booksService.getBooks(query);
+    return successResponse(c, books);
+};
+
+export const getMyBooks = async (c: Context) => {
+    const userId = c.get('user').id
+    const query = bookQuerySchema.parse(c.req.query());
+    const books = await booksService.getBooks({ ownerId: userId, ...query });
+    return successResponse(c, books);
+};
+
+
+export const deleteBook = async (c: Context) => {
+    const bookId = parseInt(c.req.param("bookId"));
+    const existingBook = await booksService.getBookById(bookId);
+    if (!existingBook) return failureResponse(c, "Book not found", 404);
+    await booksService.deleteBook(bookId);
+    return successResponse(c, "Book deleted successfully");
+}

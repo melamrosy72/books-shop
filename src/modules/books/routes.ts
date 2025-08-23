@@ -4,23 +4,23 @@ import { authMiddleware } from '../../middleware/authChecker.js';
 export const booksRoutes = new Hono()
 
 // ● API for listing all books with pagination
-// booksRoutes.get('/', booksController.getAllBooks)
+booksRoutes.get('/', booksController.getAllBooks)
 
 // ● API for getting the book details(Title, Price, Thumbnail, Author, Category)
-// booksRoutes.get('/:bookId', booksController.getBook)
+booksRoutes.get('/:bookId/details', booksController.getBookById)
 
 // ● API for editing my books only
 // booksRoutes.patch('/:bookId', booksController.editBook)
 
 // ● API for deleting my books only
-// booksRoutes.delete('/:bookId', booksController.deleteBook)
+booksRoutes.delete('/:bookId', booksController.deleteBook)
 
 // ● API for Fetching My Books only with pagination
 // ● My books API should be authenticated only
-// booksRoutes.get('/',authMiddleware, booksController.getMyBooks)
+booksRoutes.get('/my-books', authMiddleware, booksController.getMyBooks)
 
 // ● Create a new book
-// booksRoutes.post('/',authMiddleware, booksController.createBook)
+booksRoutes.post('/', authMiddleware, booksController.createBook)
 
 
 // ● Add search by title and sorting by title(A - Z / Z - A)  ############################
