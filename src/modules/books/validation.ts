@@ -39,7 +39,7 @@ export const createBookSchema = z.object({
     title: z.string('Title is required').min(1, "Title is required").max(250, "Title is too long"),
     price: z.number('Price is required').positive("Price must be positive"),
     description: z.string().max(1000, "Description is too long").optional(),
-    thumbnail: z.string().url("Thumbnail must be a valid URL").optional(),
+    thumbnail: z.string().url("Thumbnail must be a valid URL").optional().nullable(),
     authorId: z.number().int(),
     categoryId: z.number().int(),
     ownerId: z.number().int().optional(),
@@ -55,6 +55,7 @@ export const updateBookSchema = z.object({
     thumbnail: z.string().url().optional(),
     authorId: z.number().int().optional(),
     categoryId: z.number().int().optional(),
+    tags: z.array(z.number().int()).optional(),
 });
 
 

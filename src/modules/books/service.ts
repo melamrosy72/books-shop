@@ -3,7 +3,8 @@ import { db } from "../../db/index.js";
 import { authors, books, booksToTags, categories, tags } from "../../db/schema.js";
 import { and, asc, between, desc, eq, gt, gte, ilike, lt, lte, SQL, sql } from "drizzle-orm";
 import { ClientError } from "../../utils/errorHandler.js";
-import type { BookQueryInput, CreateAuthorInput, CreateBookInput, CreateCategoryInput, CreateTagInput } from "./validation.js";
+import type { BookQueryInput, CreateAuthorInput, CreateBookInput, CreateCategoryInput, CreateTagInput, UpdateBookInput } from "./validation.js";
+import { deleteThumbnail, uploadThumbnail } from "../../utils/ThumbnailFile.js";
 
 //                                  ====== Categories =====
 // Create Category
@@ -58,22 +59,30 @@ export const getTags = async () => {
 
 //                                  ====== Books =====
 // Create Book
-export const createBook = async (userId: number, data: CreateBookInput) => {
+export const createBook = async (userId: number, data: CreateBookInput, thumbnailFile?: File) => {
+    // Handle thumbnail upload
+    let thumbnailUrl: string | null = null;
+    if (thumbnailFile) {
+        thumbnailUrl = await uploadThumbnail(thumbnailFile);
+    }
+    // TODO : validate tags,category and author existence before creating
+    // create book
     const [book] = await db.insert(books).values({
         ...data,
         ownerId: userId,
+        thumbnail: thumbnailUrl,
     }).returning();
 
+    // insert in pivot table
     if (data.tags && data.tags.length > 0) {
         const tagsData = data.tags.map((tagId: number) => ({
             bookId: book.id,
             tagId,
-        }))
+        }));
         await db.insert(booksToTags).values(tagsData);
     }
     return book;
 };
-
 // Get Book By Id
 export const getBookById = async (id: number) => {
     const [book] = await db
@@ -84,6 +93,7 @@ export const getBookById = async (id: number) => {
             price: books.price,
             thumbnail: books.thumbnail,
             author: { id: authors.id, name: authors.name },
+            ownerId: books.ownerId,
             category: { id: categories.id, name: categories.name },
             tags: sql`json_agg(json_build_object('id', ${tags.id}, 'name', ${tags.name}))`.as("tags"),
         })
@@ -176,3 +186,50 @@ export const getBooks = async (query: BookQueryInput) => {
 export const deleteBook = async (id: number) => {
     await db.delete(books).where(eq(books.id, id));
 }
+
+
+
+
+
+export const editBook = async (
+    userId: number,
+    bookId: number,
+    data: UpdateBookInput,
+    thumbnailFile?: File
+) => {
+    // check book existence
+    const existingBook = await getBookById(bookId);
+    if (!existingBook) throw new ClientError("Book not found", 404);
+    // check ownership
+    if (existingBook.ownerId !== userId) throw new ClientError("Unauthorized", 401);
+    // Handle thumbnail upload and delete old thumbnail
+    let thumbnailUrl: string | null = null;
+    if (thumbnailFile) {
+        // Delete old thumbnail
+        if(existingBook.thumbnail) await deleteThumbnail(existingBook.thumbnail);
+        thumbnailUrl = await uploadThumbnail(thumbnailFile);
+    }
+
+    // Update book
+    await db.update(books)
+        .set({
+            ...data,
+            thumbnail: thumbnailUrl,
+            updatedAt: new Date(),
+        })
+        .where(eq(books.id, bookId));
+
+    // Update tags if provided
+    if (data.tags) {
+        // Remove old tags
+        await db.delete(booksToTags).where(eq(booksToTags.bookId, bookId));
+        if (data.tags.length > 0) {
+            const tagsData = data.tags.map(tagId => ({ bookId, tagId }));
+            await db.insert(booksToTags).values(tagsData);
+        }
+    }
+
+    // Return updated book
+    const [updatedBook] = await db.select().from(books).where(eq(books.id, bookId));
+    return updatedBook;
+};
