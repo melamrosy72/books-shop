@@ -2,16 +2,20 @@ import 'dotenv/config'
 import { Hono, type Context } from 'hono'
 import { logger } from 'hono/logger'
 import { serve } from '@hono/node-server'
-
 import { routes } from './modules/index.js'
 import { ClientError } from './utils/errorHandler.js'
-import type { StatusCode } from 'hono/utils/http-status'
+import { cors } from 'hono/cors'
+import { csrf } from 'hono/csrf'
 import z from 'zod'
 import { serveStatic } from '@hono/node-server/serve-static'
+import { secureHeaders } from 'hono/secure-headers'
 const app = new Hono()
 
 // Middlewares
 app.use('*', logger())
+app.use('*', cors())
+app.use(csrf())
+app.use(secureHeaders())
 app.use('/uploads/*', serveStatic({ root: './' }))
 
 // Routes
@@ -20,6 +24,7 @@ app.route('/api/v1/users', routes.users)
 app.route('/api/v1/books', routes.books)
 app.get('/', (c: Context) => c.json({ status: 'success', message: 'Books Shop API is running 🚀' }))
 
+// Error handling
 app.notFound((c: Context) => c.json({ error: 'Not found' }, 404))
 app.onError((err: Error, c: Context) => {
     if (err instanceof ClientError) {
