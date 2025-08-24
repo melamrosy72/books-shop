@@ -60,7 +60,7 @@ export const forgotPassword = async (email: string) => {
     const existingUser = await db.query.users.findFirst({
         where: eq(users.email, email)
     })
-    if (!existingUser) throw new Error("User Not Found")
+    if (!existingUser) throw new ClientError("User Not Found")
     // static otp for demo
     const otp = '123456' // (Math.floor(100000 + Math.random() * 900000)).toString();
     await db.update(users).set({

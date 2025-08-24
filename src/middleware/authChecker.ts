@@ -19,11 +19,10 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
         const decoded = verifyAccessToken(token);
 
-
         // (Optional) check if token is blacklisted (logout/forced expire scenario)
         const blacklisted = await redis.get(`refresh:${decoded.userId}`);
         if (!blacklisted) {
-            return c.json({ error: "Token is no longer valid" }, 401);
+            return c.json({ success: false, error: "Token is no longer valid" }, 401);
         }
 
         // Attach userId to context
@@ -31,6 +30,6 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
         await next();
     } catch (err: any) {
-        return c.json({ error: "Invalid or expired access token" }, 401);
+        return c.json({ success: false, error: "Invalid or expired access token" }, 401);
     }
 };

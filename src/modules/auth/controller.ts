@@ -72,22 +72,19 @@ export const login = async (c: Context) => {
 };
 
 export const forgotPassword = async (c: Context) => {
-
     const body = await c.req.json()
     const validatedData = forgetPasswordSchema.parse(body)
     // generate otp
     await authService.forgotPassword(validatedData.email)
     //      In Real Life Scenario, We will handle email sending here with a dynamic otp & expiration time
     return c.json({ success: true, message: 'otp generated, you can reset password now with the static otp' }) // just return it for demo
-
-
 }
 
 export const resetPassword = async (c: Context) => {
     const body = await c.req.json()
     const validatedData = resetPasswordSchema.parse(body)
     await authService.resetPassword(validatedData)
-    return c.json({ message: "Password reset successful" })
+    return c.json({ success: true, message: "Password reset successful" })
 }
 
 
@@ -100,9 +97,7 @@ export const logout = async (c: Context) => {
 
 
 export const refresh = async (c: Context) => {
-
     const { refreshToken } = await c.req.json();
-
     try {
         const decoded: any = verifyRefreshToken(refreshToken);
         // Check in Redis

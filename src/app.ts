@@ -14,9 +14,9 @@ const app = new Hono()
 // Middlewares
 app.use('*', logger())
 app.use('*', cors())
-app.use(csrf())
 app.use(secureHeaders())
 app.use('/uploads/*', serveStatic({ root: './' }))
+app.use('/paths-to-be-protected/',csrf()) 
 
 // Routes
 app.route('/api/v1/auth', routes.auth)
@@ -28,7 +28,7 @@ app.get('/', (c: Context) => c.json({ status: 'success', message: 'Books Shop AP
 app.notFound((c: Context) => c.json({ error: 'Not found' }, 404))
 app.onError((err: Error, c: Context) => {
     if (err instanceof ClientError) {
-        return c.json({ error: err.message }, 400);
+        return c.json({ success: false, error: err.message }, 400);
     }
     if (err instanceof z.ZodError) {
         // const messages = err.issues.map((issue) => issue.message);
@@ -36,7 +36,7 @@ app.onError((err: Error, c: Context) => {
         return c.json({ success: false, errors: messages }, 400);
     }
     if (err instanceof SyntaxError && err.message.includes('JSON')) {
-        return c.json({ error: 'Invalid JSON format' }, 400);
+        return c.json({ success: false, error: 'Invalid JSON format' }, 400);
     }
     console.log(err);
     return c.json({ error: err.message }, 500)

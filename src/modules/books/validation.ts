@@ -66,7 +66,7 @@ export const bookQuerySchema = z.object({
     search: z.string().optional(),
     sort: z.enum(["asc", "desc"]).optional(),
     paginated: z.coerce.boolean().optional(),
-    categoryId: z.number().int().optional(),
+    categoryId: z.coerce.number().int().optional(),
     minPrice: z.string().optional(),
     maxPrice: z.string().optional(),
     ownerId: z.number().int().optional(),
