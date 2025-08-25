@@ -260,7 +260,7 @@ describe('Users Controller', () => {
         'oldpassword123',
         'oldhashedpassword',
       );
-      expect(usersService.changePassword).toHaveBeenCalledWith(1, mockPasswordData);
+      expect(usersService.changePassword).toHaveBeenCalledWith(1, mockPasswordData.newPassword);
       expect(mockContext.json).toHaveBeenCalledWith({
         success: true,
         message: 'Password Has Been Changed Successfully',
@@ -502,7 +502,7 @@ describe('Users Controller', () => {
         } as any);
 
         // Act
-        const result = await usersService.changePassword(1, mockPasswordData);
+        const result = await usersService.changePassword(1, mockPasswordData.newPassword);
 
         // Assert
         expect(result).toBeDefined();
@@ -520,7 +520,7 @@ describe('Users Controller', () => {
         vi.mocked(usersService.changePassword).mockRejectedValue(serviceError);
 
         // Act & Assert
-        await expect(usersService.changePassword(1, mockPasswordData)).rejects.toThrow(
+        await expect(usersService.changePassword(1, mockPasswordData.newPassword)).rejects.toThrow(
           'Database update failed',
         );
       });

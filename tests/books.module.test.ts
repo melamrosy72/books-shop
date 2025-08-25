@@ -813,7 +813,7 @@ describe('Books Controller', () => {
 
       // Mock req.param to return the string value
       mockContext.req.param.mockImplementation((key: string) => {
-        if (key === 'bookId') return '1';
+        if (key === 'bookId') return 1;
         return undefined;
       });
 

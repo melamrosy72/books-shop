@@ -268,12 +268,12 @@ describe('Auth Controller - Login', () => {
       expect(jwtService.generateAccessToken).not.toHaveBeenCalled();
       expect(mockRedis.set).not.toHaveBeenCalled();
       expect(mockContext.json).toHaveBeenCalledWith(
-        { success: false, error: 'Invalid credentials' },
-        401,
+        { success: false, error: 'User not found' },
+        404,
       );
     });
 
-    it('should return 401 if password is incorrect', async () => {
+    it('should return 404 if password is incorrect', async () => {
       // Arrange
       const mockLoginData = {
         login: 'testuser',
@@ -308,7 +308,7 @@ describe('Auth Controller - Login', () => {
       expect(jwtService.generateAccessToken).not.toHaveBeenCalled();
       expect(mockRedis.set).not.toHaveBeenCalled();
       expect(mockContext.json).toHaveBeenCalledWith(
-        { success: false, error: 'Invalid credentials' },
+        { success: false, error: 'Invalid Credentials' },
         401,
       );
     });
