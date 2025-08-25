@@ -13,8 +13,11 @@
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
     "hono": "^4.9.2",
+    "hono-rate-limiter": "^0.4.2",
+    "install": "^0.13.0",
     "ioredis": "^5.7.0",
     "jsonwebtoken": "^9.0.2",
+    "npm": "^11.5.2",
     "pg": "^8.16.3",
     "zod": "^4.0.17"
   },

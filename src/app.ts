@@ -9,14 +9,18 @@ import { csrf } from 'hono/csrf'
 import z from 'zod'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { secureHeaders } from 'hono/secure-headers'
-const app = new Hono()
+import { bodyLimit } from 'hono/body-limit'
+import { reqLimiter, bodyLimiter } from './middleware/limiters.js'
 
+const app = new Hono()
 // Middlewares
 app.use('*', logger())
 app.use('*', cors())
 app.use(secureHeaders())
 app.use('/uploads/*', serveStatic({ root: './' }))
-app.use('/paths-to-be-protected/',csrf()) 
+app.use('/paths-to-be-protected/', csrf())
+app.use('*', bodyLimiter)
+app.use('*', reqLimiter)
 
 // Routes
 app.route('/api/v1/auth', routes.auth)
