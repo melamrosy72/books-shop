@@ -1,14 +1,11 @@
-import { Hono } from "hono"
-import * as usersController from "./controller.js"
+import { Hono } from 'hono';
+import * as usersController from './controller.js';
 import { authMiddleware } from '../../middleware/authChecker.js';
-export const usersRoutes = new Hono()
+export const usersRoutes = new Hono();
 
 // ● API for user profile details
-usersRoutes.get("/profile", authMiddleware, usersController.getProfile)
+usersRoutes.get('/profile', authMiddleware, usersController.getProfile);
 // ● API for editing user details
-usersRoutes.patch("/edit-profile", authMiddleware, usersController.editProfile)
+usersRoutes.patch('/edit-profile', authMiddleware, usersController.editProfile);
 // ● API for changing the user password
-usersRoutes.patch("/change-password", authMiddleware, usersController.changePassword)
-
-
-
+usersRoutes.patch('/change-password', authMiddleware, usersController.changePassword);
