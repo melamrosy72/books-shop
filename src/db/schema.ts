@@ -24,7 +24,7 @@ export const categories = pgTable('categories', {
 // Authors
 export const authors = pgTable('authors', {
     id: serial('id').primaryKey(),
-    name: varchar('name', { length: 100 }).notNull(),
+    name: varchar('name', { length: 100 }).notNull().unique(),
     bio: text('bio'),
 });
 

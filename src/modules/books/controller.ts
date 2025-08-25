@@ -1,7 +1,7 @@
 import { type Context } from "hono"
 import * as booksService from "./service.js"
 import { failureResponse, successResponse } from "../../utils/response.js";
-import { bookQuerySchema, createAuthorSchema, createBookSchema, createCategorySchema, createTagSchema, updateBookSchema, } from "./validation.js";
+import { bookQuerySchema, createAuthorSchema, createBookSchema, createCategorySchema, createTagSchema, getBookByIdSchema, updateBookSchema, } from "./validation.js";
 import { deleteThumbnail, uploadThumbnail } from "../../utils/ThumbnailFile.js";
 
 
@@ -132,7 +132,8 @@ export const createBook = async (c: Context) => {
 
 export const getBookById = async (c: Context) => {
     const bookId = parseInt(c.req.param("bookId"));
-    const book = await booksService.getBookById(bookId);
+    const validBookId = getBookByIdSchema.parse({ bookId });
+    const book = await booksService.getBookById(validBookId.bookId);
     if (!book) return failureResponse(c, "Book not found", 404);
     return successResponse(c, book);
 };
@@ -153,7 +154,8 @@ export const getMyBooks = async (c: Context) => {
 
 export const deleteBook = async (c: Context) => {
     const bookId = parseInt(c.req.param("bookId"));
-    const existingBook = await booksService.getBookById(bookId);
+    const validBookId = getBookByIdSchema.parse({ bookId });
+    const existingBook = await booksService.getBookById(validBookId.bookId);
     if (!existingBook) return failureResponse(c, "Book not found", 404);
     await deleteThumbnail(existingBook.thumbnail!);
     await booksService.deleteBook(bookId);
@@ -166,6 +168,7 @@ export const deleteBook = async (c: Context) => {
 export const editBook = async (c: Context) => {
     const userId = c.get('user').id;
     const bookId = Number(c.req.param('bookId'));
+    const validBookId = getBookByIdSchema.parse({ bookId });
     const formData = await c.req.formData();
 
     // Extract fields
@@ -180,7 +183,7 @@ export const editBook = async (c: Context) => {
         .filter(tag => !isNaN(tag));
     const thumbnailFile = formData.get('thumbnail') as File | null;
 
-    
+
     const validatedData = updateBookSchema.parse({
         title,
         description,
@@ -192,7 +195,7 @@ export const editBook = async (c: Context) => {
 
     const updatedBook = await booksService.editBook(
         userId,
-        bookId,
+        validBookId.bookId,
         validatedData,
         thumbnailFile ?? undefined
     );

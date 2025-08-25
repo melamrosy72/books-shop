@@ -73,7 +73,9 @@ export const bookQuerySchema = z.object({
 });
 
 
-
+export const getBookByIdSchema = z.object({
+    bookId: z.number().int().positive()
+})
 
 
 
