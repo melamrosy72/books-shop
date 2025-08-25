@@ -10,8 +10,10 @@ import z from 'zod';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { secureHeaders } from 'hono/secure-headers';
 import { reqLimiter, bodyLimiter } from './middleware/limiters.js';
+import { i18nMiddleware, useTranslation } from './middleware/i18n.js';
 
 const app = new Hono();
+
 // Middlewares
 app.use('*', logger());
 app.use('*', cors());
@@ -20,14 +22,16 @@ app.use('/uploads/*', serveStatic({ root: './' }));
 app.use('/paths-to-be-protected/', csrf());
 app.use('*', bodyLimiter);
 app.use('*', reqLimiter);
+app.use('*', i18nMiddleware);
 
 // Routes
 app.route('/api/v1/auth', routes.auth);
 app.route('/api/v1/users', routes.users);
 app.route('/api/v1/books', routes.books);
-app.get('/', (c: Context) =>
-  c.json({ status: 'success', message: 'Books Shop API is running 🚀' }),
-);
+app.get('/', (c: Context) => {
+  const t = useTranslation(c);
+  return c.json({ success: true, message: t('your_parts_about') }, 200); // Multi-Language Support test
+});
 
 // Error handling
 app.notFound((c: Context) => c.json({ error: 'Not found' }, 404));
