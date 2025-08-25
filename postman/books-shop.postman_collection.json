@@ -1,0 +1,981 @@
+{
+	"info": {
+		"_postman_id": "dfcbb2f9-f73c-415d-b769-fe176abf4725",
+		"name": "books-shop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47848321",
+		"_collection_link": "https://elamrosy.postman.co/workspace/Team-Workspace~86195b76-3f3d-4259-863c-a8daeae0f7d7/collection/47848321-dfcbb2f9-f73c-415d-b769-fe176abf4725?action=share&source=collection_link&creator=47848321"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"yourparts\",\r\n    \"email\":\"yourparts@gmail.com\",\r\n    \"password\":\"yourparts\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/register",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						},
+						"description": "## Register User\n\nThis endpoint allows new users to register by providing their username, email, and password. Upon successful registration, the server responds with a confirmation and tokens for authentication.\n\n### Request\n\n- **Method**: POST\n    \n- **URL**: `{{localhost}}/api/v1/auth/register`\n    \n- **Request Body** (JSON):\n    \n    - `username` (string): The desired username for the new account.\n        \n    - `email` (string): The email address associated with the account.\n        \n    - `password` (string): The password for the account.\n        \n\n### Response\n\n- **Status Code**: 201 Created\n    \n- **Content-Type**: application/json\n    \n- **Response Body**:\n    \n    - `success` (boolean): Indicates whether the registration was successful.\n        \n    - `accessToken` (string): A token used for authenticating the user in subsequent requests.\n        \n    - `refreshToken` (string): A token used to obtain a new access token when the current one expires.\n        \n\n#### Example Response\n\n``` json\n{\n  \"sucess\": \"true\",\n  \"accessToken\": \"access_token\",\n  \"refreshToken\": \"refresh_token\"\n}\n\n ```\n\n### Notes\n\n- Ensure that the username and email are unique to avoid conflicts during registration.\n    \n- The response will include tokens that should be securely stored for future authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // \"login\": \"melamrosy72@gmail.com\",                // with email\r\n    \"login\": \"Mahmoud Elamrosy v1\",                        // with username\r\n    \"password\": \"asdasd1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/login",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						},
+						"description": "## Login API\n\nThis endpoint allows users to authenticate and obtain access and refresh tokens. It is a crucial part of the authentication process for accessing protected resources.\n\n### HTTP Method\n\n`POST`\n\n### Endpoint\n\n`{{localhost}}/api/v1/auth/login`\n\n### Request Parameters\n\nThe request body must be in JSON format and include the following parameters:\n\n- **login** (string): The username or email of the user attempting to log in.\n    \n- **password** (string): The password associated with the user's account.\n    \n\n#### Example Request Body\n\n``` json\n{\n  \"login\": \"user@example.com\",\n  \"password\": \"your_password\"\n}\n\n ```\n\n### Expected Response\n\nOn a successful login, the server responds with a status code of `200` and a JSON object containing the following fields:\n\n- **username** (string): The username of the authenticated user.\n    \n- **accessToken** (string): A token that can be used for subsequent authenticated requests.\n    \n- **refreshToken** (string): A token that can be used to obtain a new access token when the current one expires.\n    \n\n#### Example Response\n\n``` json\n{\n  \"username\": \"user@example.com\",\n  \"accessToken\": \"your_access_token\",\n  \"refreshToken\": \"your_refresh_token\"\n}\n\n ```\n\n### Notes\n\n- Ensure that the login credentials are correct to receive a successful response.\n    \n- The access token is typically short-lived, while the refresh token can be used to request a new access token without requiring the user to log in again."
+					},
+					"response": []
+				},
+				{
+					"name": "Forget Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"melamrosy72@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/forgot-password",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "## Forgot Password API\n\nThis endpoint allows users to initiate the password recovery process by submitting their registered email address. Upon successful submission, the system will trigger the necessary steps to assist the user in resetting their password.\n\n### Request\n\n- **Method:** POST\n    \n- **Endpoint:** `{{localhost}}/api/v1/auth/forgot-password`\n    \n- **Content-Type:** application/json\n    \n\n#### Request Body\n\nThe request body must be in JSON format and should contain the following parameter:\n\n- **email** (string): The email address associated with the user's account. This is required to identify the account for which the password reset process will be initiated.\n    \n\n**Example Request Body:**\n\n``` json\n{\n  \"email\": \"user@example.com\"\n}\n\n ```\n\n### Response\n\n- **Status Code:** 200\n    \n- **Content-Type:** application/json\n    \n\n#### Response Body\n\nOn a successful request, the response will be in JSON format and will contain the following fields:\n\n- **success** (boolean): Indicates whether the request was successful.\n    \n- **message** (string): A message providing additional information about the request status. This may be empty or contain relevant details.\n    \n\n**Example Response Body:**\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"otp generated, you can reset password now with the static otp\"\n}\n\n ```\n\n### Summary\n\nThis API is essential for users who have forgotten their passwords and need to initiate a recovery process. Ensure that the email provided in the request body is valid and associated with an existing account to receive the necessary instructions for resetting the password."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"shiko@gmail.com\",\r\n    \"otp\":\"123456\",\r\n    \"newPassword\":\"asdasd1\",\r\n    \"confirmPassword\":\"asdasd1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/reset-password",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "### Reset Password API\n\nThis endpoint allows users to reset their password using a one-time password (OTP) sent to their registered email address. It is part of the authentication process to ensure that only the rightful owner of the account can change their password.\n\n#### Request\n\n**Method:** POST  \n**Endpoint:** `/api/v1/auth/reset-password`\n\n**Request Body:**  \nThe request body must be a JSON object containing the following parameters:\n\n- **email** (string)\n    \n- **otp** (string)\n    \n- **newPassword** (string)\n    \n- **confirmPassword** (string)\n    \n\n#### Response\n\n#### Example Response\n\n- Success\n    \n\n``` json\n{\n  \"sucess\": \"true\",\n  \"message\": \"Password reset successful\",\n}\n\n ```\n\n- Bad Request\n    \n\n``` json\n{\n    \"success\": false,\n    \"error\": \"User Has Not Requested For Password Reset\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"refreshToken\": \"{{vault:json-web-token}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/refresh",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "## Refresh Token API\n\nThis endpoint is used to refresh the user's authentication token using a valid refresh token.\n\n### HTTP Method\n\n`POST`\n\n### Endpoint\n\n`{{localhost}}/api/v1/auth/refresh`\n\n### Request Parameters\n\nThe request body must contain the following parameter:\n\n- **refreshToken** (string): The refresh token used to obtain a new authentication token. This should be a valid token stored securely.\n    \n\n### Expected Response\n\nThe response will return a JSON object with the following structure:\n\n- **success** (boolean)\n    \n- **accessToken (string)**\n    \n- **refreshToken (string)**\n    \n- **error** (string): Contains error messages if any occurred during the processing of the request.\n    \n\n### Response Status Codes\n\n- **200 OK**: Indicates that the token has been successfully refreshed.\n    \n- **401 Unauthorized**: Indicates that the provided refresh token is invalid or expired.\n    \n\n### Example Request\n\n``` json\n{\n  \"refreshToken\": \"{{vault:json-web-token}}\"\n}\n\n ```\n\n### Example Response\n\n``` json\n {\n            \"success\": true,\n            \"accessToken\": newAccessToken,\n            \"refreshToken\": newRefreshToken,\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/auth/logout",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "## Logout API\n\nThis endpoint is used to log out a user from the application. Upon a successful request, the user's session will be terminated.\n\n### Request\n\n- **Method**: POST\n    \n- **URL**: `{{localhost}}/api/v1/auth/logout`\n    \n\n#### Request Parameters\n\nThis endpoint does not require any request body parameters. The logout action is performed based on the user's current session.\n\n#### Response\n\n#### Example Response\n\n- Success\n    \n\n``` json\n{\n  \"sucess\": \"true\",\n  \"message\": \"Logged out Successfully\",\n}\n\n ```\n\n- Bad Request\n    \n\n``` json\n{\n    \"success\": false,\n    \"error\": \"User Has Not Requested For Password Reset\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{vault:authorization-secret}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/users/profile",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"profile"
+							]
+						},
+						"description": "## Get User Profile\n\nThis endpoint retrieves the profile information of the authenticated user. It provides details such as the user's ID, username, email, and timestamps for account creation and updates.\n\n### Request\n\n- **Method**: GET\n    \n- **URL**: `{{localhost}}/api/v1/users/profile`\n    \n\n### Response\n\nUpon a successful request, the API will return a JSON object with the following structure:\n\n- **success** (boolean): Indicates whether the request was successful.\n    \n- **data** (object): Contains the user's profile information:\n    \n    - **id** (integer): The unique identifier of the user.\n        \n    - **username** (string): The username of the user.\n        \n    - **email** (string): The email address of the user.\n        \n    - **resetPassOtp** (string or null): One-time password for resetting the user's password, if applicable.\n        \n    - **createdAt** (string): The timestamp when the user account was created.\n        \n    - **updatedAt** (string): The timestamp when the user account was last updated.\n        \n\n### Example Response\n\n``` json\n{\n  \"success\": true,\n  \"data\": {\n    \"id\": 0,\n    \"username\": \"\",\n    \"email\": \"\",\n    \"resetPassOtp\": null,\n    \"createdAt\": \"\",\n    \"updatedAt\": \"\"\n  }\n}\n\n ```\n\nThis endpoint is essential for applications that require user profile information to be displayed or utilized in various functionalities."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"usernaame\": \"Mahmoud Elamrosy v1\" // optional\r\n    // \"email\": \"\" // optional\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/users/edit-profile",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"edit-profile"
+							]
+						},
+						"description": "### Edit User Profile\n\nThis endpoint allows users to update their profile information. Specifically, it enables the modification of the user's username.\n\n#### Request\n\n- **Method**: PATCH\n    \n- **URL**: `{{localhost}}/api/v1/users/edit-profile`\n    \n- **Content-Type**: application/json\n    \n\n#### Request Body Parameters\n\n- **username** (string): The new username for the user. This value should be unique and not previously used by another user.\n    \n\n#### Example Request\n\n``` json\n{\n  \"username\": \"user\"\n  // or\n  \"email\":\"ex@gmmail.comm\"\n}\n\n ```\n\n#### Example Response\n\n- Success (200)\n    \n\n``` json\n\"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"email\": \"updated@gmail.com\",\n        \"username\": \"updatedUser\",\n        \"createdAt\": \"2025-08-22T04:58:35.459Z\",\n        \"updatedAt\": \"2025-08-24T14:41:38.850Z\"\n    }\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oldPassword\":\"asdasd1\",\r\n    \"newPassword\":\"asdasd1\",\r\n    \"confirmPassword\":\"asdasd1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/users/change-password",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"change-password"
+							]
+						},
+						"description": "### Change Password Endpoint\n\nThis endpoint allows users to update their password by providing their current password along with the new password they wish to set.\n\n#### Request\n\n- **Method**: PATCH\n    \n- **URL**: `{{localhost}}/api/v1/users/change-password`\n    \n- **Content-Type**: application/json\n    \n\n##### Request Body Parameters:\n\n- `oldPassword` (string): The current password of the user that needs to be verified.\n    \n- `newPassword` (string): The new password that the user wants to set.\n    \n- `confirmPassword` (string): A confirmation of the new password to ensure accuracy.\n    \n\n#### Example Response\n\n``` json\n{\n    \"success\": true,\n    \"message\": \"Password Has Been Changed Successfully\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Books",
+			"item": [
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vault:authorization-secret}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"BBBB\"\r\n    // ,\"description\": \"\"                   // optional\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/categories",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"categories"
+									]
+								},
+								"description": "## Add Book Category\n\nThis endpoint allows you to add a new category for books in the system. By sending a POST request to this endpoint, you can create a category that can be used to classify books, enhancing the organization and retrieval of book-related data.\n\n### Request Format\n\n- **Method**: `POST`\n    \n- **URL**: `{{localhost}}/api/v1/books/categories`\n    \n- **Headers**:\n    \n    - `Content-Type: application/json` - This header indicates that the request body format is JSON.\n        \n\n### Request Body\n\nThe request body must be in JSON format and should contain the following parameters:\n\n- **name** (string, required): The name of the category you wish to add. For example, `\"Fiction\"`.\n    \n\n#### Example Request Body\n\n``` json\n{\n    \"name\": \"High Performance MySQL\"\n    // ,\"description\": \"\"                   // optional\n}\n\n ```\n\n### Response Structure\n\nUpon a successful request, the server will respond with a status code indicating the result of the operation. The response will typically include:\n\n- **status** (string): Indicates the success or failure of the operation.\n    \n- **message** (string): A message providing additional information about the result of the request.\n    \n- **data** (object): Contains details of the created category, including its ID and name.\n    \n\n#### Example Response\n\n``` json\n{\n  \"status\": \"success\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"BBBB\",\n        \"description\": null\n    }\n}\n\n ```\n\nMake sure to handle any errors that may arise, such as validation errors or server issues, as they will be returned in a similar JSON format with appropriate status codes."
+							},
+							"response": []
+						},
+						{
+							"name": "All",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/categories",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Authors",
+					"item": [
+						{
+							"name": "Create",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// testing body limmit\r",
+											"// let bigString = \"a\".repeat(6 * 1024 * 1024); // ~6MB\r",
+											"// pm.variables.set(\"bigBody\", JSON.stringify({ data: bigString }));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Robert Kiyosaki\"\r\n    // ,\"bio\":\"my bio\" // optional\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/authors",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"authors"
+									]
+								},
+								"description": "### Add Author\n\nThis endpoint allows you to add a new author to the book database.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{localhost}}/api/v1/books/authors`\n    \n\n#### Request Body\n\nThe request body must be a JSON object containing the following parameter:\n\n- **name** (string): The name of the author to be added. This is a required field.\n    \n\n#### Example Request Body\n\n``` json\n{\n  \"name\": \"Robert Kiyosaki\"\n}\n\n ```\n\n#### Response\n\n#### Response\n\n#### Example Response\n\n- Success\n    \n\n``` json\n{\n  \"sucess\": \"true\",\n  \"data\": {\n        \"id\": 2,\n        \"name\": \"Robert Kiyosaki\",\n        \"bio\": null\n    }\n}\n\n ```\n\n#### Notes\n\n- Ensure that the name provided is unique to avoid duplication errors.\n    \n- Proper error handling should be implemented to manage cases where the name is missing or invalid."
+							},
+							"response": []
+						},
+						{
+							"name": "All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/authors",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"authors"
+									]
+								},
+								"description": "## Get Authors\n\nThis endpoint retrieves a list of authors from the books database. It is useful for applications that need to display or manage author information related to books.\n\n### Request\n\n- **Method**: GET\n    \n- **Endpoint**: `{{localhost}}/api/v1/books/authors`\n    \n\n### Response\n\nThe response will contain a JSON object with the following structure:\n\n- **authors**: An array of author objects, where each object includes:\n    \n    - **id**: A unique identifier for the author.\n        \n    - **name**: The name of the author.\n        \n    - **bio**: A brief biography of the author.\n        \n    - **books**: An array of book titles authored by this author.\n        \n\n### Example Response\n\n``` json\n{\n  \"authors\": [\n    {\n      \"id\": \"1\",\n      \"name\": \"Author Name\",\n      \"bio\": \"Author biography.\",\n      \"books\": [\"Book Title 1\", \"Book Title 2\"]\n    },\n    {\n      \"id\": \"2\",\n      \"name\": \"Another Author\",\n      \"bio\": \"Another author's biography.\",\n      \"books\": [\"Another Book Title\"]\n    }\n  ]\n}\n\n ```\n\n### Notes\n\n- No input parameters are required for this request.\n    \n- Ensure that the server is running and accessible at the specified localhost address."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Tags",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"New\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/tags",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"tags"
+									]
+								},
+								"description": "### Add Book Tag\n\nThis endpoint allows you to add a new tag for books in the system.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{localhost}}/api/v1/books/tags`\n    \n- **Content-Type**: application/json\n    \n\n##### Request Body\n\nThe request body must be a JSON object containing the following parameter:\n\n- `name` (string): The name of the tag you wish to add.\n    \n\n##### Example Request\n\n``` json\n{\n  \"name\": \"New\"\n}\n\n ```\n\n#### Response\n\nOn a successful request, the server will respond with:\n\n- **Status Code**: 201 Created\n    \n- **Content-Type**: application/json\n    \n\n##### Response Body\n\nThe response will contain a JSON object with the following structure:\n\n- `success` (boolean): Indicates whether the operation was successful.\n    \n- `data` (object): Contains the details of the created tag.\n    \n    - `id` (integer): The unique identifier for the newly created tag.\n        \n    - `name` (string): The name of the tag that was added.\n        \n\n##### Example Response\n\n``` json\n{\n  \"success\": true,\n  \"data\": {\n    \"id\": 0,\n    \"name\": \"\"\n  }\n}\n\n ```\n\n#### Notes\n\n- Ensure that the `name` parameter is provided in the request body, as it is required for creating a new tag.\n    \n- The `id` in the response will be the identifier assigned to the new tag, while the `name` will reflect what was submitted in the request."
+							},
+							"response": []
+						},
+						{
+							"name": "All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}/api/v1/books/tags",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"books",
+										"tags"
+									]
+								},
+								"description": "## Endpoint: `GET /api/v1/books/tags`\n\nThis endpoint retrieves a list of tags associated with books in the system. Tags can be used to categorize or label books for easier searching and filtering.\n\n### Request Parameters\n\nThis endpoint does not require any input parameters. It is a simple GET request that fetches the available tags.\n\n#### Example Response\n\n``` json\n{\n\"success\": true,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"trend\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"old\"\n        }\n    ]\n}\n\n ```\n\n### Usage\n\nUse this endpoint to obtain a comprehensive list of tags that can be used for book categorization, which can assist users in finding books based on their interests."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create Book",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Atomic Habits",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "340",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Top 10 Books",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "postman-cloud:///1f080451-d796-4880-b388-8f5dd01c18e4"
+								},
+								{
+									"key": "authorId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "tags",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "tags",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/books",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books"
+							]
+						},
+						"description": "## Create a New Book\n\nThis endpoint allows you to add a new book to the inventory. By sending a POST request to `{{localhost}}/api/v1/books`, you can submit the necessary details about the book, including its title, price, description, author, category, and associated tags.\n\n### Request Parameters\n\nThe request body must be sent as form-data and should include the following parameters:\n\n- **title** (text): The title of the book.\n    \n- **price** (text): The price of the book.\n    \n- **description** (text): A brief description of the book.\n    \n- **thumbnail** (file): An optional file upload for the book's thumbnail image.\n    \n- **authorId** (text): The identifier of the author associated with the book.\n    \n- **categoryId** (text): The identifier of the category to which the book belongs.\n    \n- **tags** (text): Comma-separated tags related to the book.\n    \n\n### Response Structure\n\nUpon a successful request, the server will respond with a status code of `201 Created` and a JSON object that confirms the successful addition of the book. The response structure will include:\n\n- **success** (boolean): Indicates whether the request was successful.\n    \n- **data** (object): Contains the details of the newly created book:\n    \n    - **id** (integer): The unique identifier assigned to the book.\n        \n    - **title** (string): The title of the book.\n        \n    - **description** (string): The description of the book.\n        \n    - **price** (number): The price of the book.\n        \n    - **thumbnail** (string): The URL or path of the uploaded thumbnail.\n        \n    - **categoryId** (integer): The identifier of the category.\n        \n    - **authorId** (integer): The identifier of the author.\n        \n    - **ownerId** (integer): The identifier of the owner (if applicable).\n        \n    - **createdAt** (string): The timestamp when the book was created.\n        \n    - **updatedAt** (string): The timestamp when the book was last updated.\n        \n\n### Usage Notes\n\nEnsure that all required fields are provided in the request. The server will validate the inputs and return the appropriate response. Use this endpoint to effectively manage your book inventory."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Book",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "new title",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "price",
+									"value": "1332",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "new desc v2",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "postman-cloud:///1f080451-d796-4880-b388-8f5dd01c18e4",
+									"disabled": true
+								},
+								{
+									"key": "authorId",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "2",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/books/:bookId",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books",
+								":bookId"
+							],
+							"variable": [
+								{
+									"key": "bookId",
+									"value": "s"
+								}
+							]
+						},
+						"description": "### Update Book Description\n\nThis endpoint allows you to update the description of a specific book identified by its `bookId`.\n\n#### Request\n\n- **Method**: PATCH\n    \n- **Endpoint**: `{{localhost}}/api/v1/books/:bookId`\n    \n- **Request Body** (form-data):\n    \n    - `description` (type: text): A string representing the new description for the book.\n        \n\n#### Response\n\nOn a successful update, the API will return a `200 OK` status with a JSON response containing the following structure:\n\n- **success** (boolean): Indicates whether the operation was successful.\n    \n- **data** (object): Contains the details of the updated book:\n    \n    - `id` (integer): The unique identifier of the book.\n        \n    - `title` (string): The title of the book.\n        \n    - `description` (string): The updated description of the book.\n        \n    - `price` (integer): The price of the book.\n        \n    - `thumbnail` (string or null): URL of the book's thumbnail image.\n        \n    - `categoryId` (integer): The identifier for the category of the book.\n        \n    - `authorId` (integer): The identifier for the author of the book.\n        \n    - `ownerId` (integer): The identifier for the owner of the book.\n        \n    - `createdAt` (string): Timestamp of when the book was created.\n        \n    - `updatedAt` (string): Timestamp of when the book was last updated.\n        \n\nThis endpoint is useful for modifying existing book entries in the system by updating their descriptions."
+					},
+					"response": []
+				},
+				{
+					"name": "Book Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response schema is valid according to the expected structure\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('success').that.is.a('boolean');\r",
+									"    pm.expect(responseData).to.have.property('data').that.is.an('array');\r",
+									"\r",
+									"    responseData.data.forEach(function(book) {\r",
+									"        pm.expect(book).to.be.an('object');\r",
+									"        pm.expect(book).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(book).to.have.property('title').that.is.a('string');\r",
+									"        pm.expect(book).to.have.property('description').that.satisfies(value => value === null || typeof value === 'string');\r",
+									"        pm.expect(book).to.have.property('price').that.is.a('string');\r",
+									"        pm.expect(book).to.have.property('thumbnail').that.satisfies(value => value === null || typeof value === 'string');\r",
+									"        \r",
+									"        pm.expect(book).to.have.property('author').that.is.an('object');\r",
+									"        pm.expect(book.author).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(book.author).to.have.property('name').that.is.a('string');\r",
+									"        \r",
+									"        pm.expect(book).to.have.property('category').that.is.an('object');\r",
+									"        pm.expect(book.category).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(book.category).to.have.property('name').that.is.a('string');\r",
+									"        \r",
+									"        pm.expect(book).to.have.property('tags').that.is.an('array');\r",
+									"\r",
+									"        book.tags.forEach(function(tag) {\r",
+									"            pm.expect(tag).to.be.an('object');\r",
+									"            pm.expect(tag).to.have.property('id').that.is.a('number');\r",
+									"            pm.expect(tag).to.have.property('name').that.is.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"The title must be a non-empty string\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;\r",
+									"    \r",
+									"    responseData.data.forEach(book => {\r",
+									"        pm.expect(book.title).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Title should not be empty\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Tags is an array containing at least one element with a non-empty name\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;\r",
+									"\r",
+									"    responseData.data.forEach(book => {\r",
+									"        pm.expect(book.tags).to.be.an('array').that.is.not.empty;\r",
+									"        book.tags.forEach(tag => {\r",
+									"            pm.expect(tag.name).to.exist.and.to.have.lengthOf.at.least(1, \"Tag name should not be empty\");\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"High Performance Mysql\",\r\n    \"price\": 220,\r\n    // \"description\":\"\", // optional \r\n    // \"thumbnail\":\"\", // optional \r\n    \"authorId\": 1,\r\n    \"categoryId\": 1,\r\n    \"tags\": [\r\n        1,\r\n        2\r\n    ]\r\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/books/:bookId/details",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books",
+								":bookId",
+								"details"
+							],
+							"variable": [
+								{
+									"key": "bookId",
+									"value": "8"
+								}
+							]
+						},
+						"description": "## Get Book Details\n\nThis endpoint retrieves detailed information about a specific book identified by its `bookId`.\n\n### Request\n\n- **Method**: GET\n    \n- **Endpoint**: `{{localhost}}/api/v1/books/:bookId/details`\n    \n- **Path Parameter**:\n    \n    - `bookId` (required): The unique identifier of the book for which details are being requested.\n        \n\n### Response\n\n- **Status Code**: 200 OK\n    \n- **Content-Type**: application/json\n    \n\n#### Response Body\n\n``` json\n    \"success\": true,\n    \"data\": {\n        \"id\": 8,\n        \"title\": \"New book\",\n        \"description\": \"desc\",\n        \"price\": 1230,\n        \"thumbnail\": \"/uploads/1755974284281_book.png\",\n        \"author\": {\n            \"id\": 1,\n            \"name\": \"Nagib Mahfouz\"\n        },\n        \"ownerId\": 29,\n        \"category\": {\n            \"id\": 1,\n            \"name\": \"Fiction\"\n        },\n        \"tags\": [\n            {\n                \"id\": 1,\n                \"name\": \"trend\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"old\"\n            }\n        ]\n    }\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "All Books",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{localhost}}/api/v1/books?search=database&paginated=true&page=1&limit=25&sort=desc&minPrice=50&maxPrice=1500&categoryId=1",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "database"
+								},
+								{
+									"key": "paginated",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "25"
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "minPrice",
+									"value": "50"
+								},
+								{
+									"key": "maxPrice",
+									"value": "1500"
+								},
+								{
+									"key": "categoryId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "### Get All Books\n\nThis endpoint retrieves a list of books based on the provided search parameters. It supports pagination, sorting, and filtering by price range.\n\n**Method**: `GET`\n\n**Endpoint**: `{{localhost}}/api/v1/books`\n\n#### Request Parameters\n\n- **search** (string): A search term to filter books by title or other attributes.\n    \n- **paginated** (boolean): Indicates whether the results should be paginated.\n    \n- **page** (integer): The current page number of the results to retrieve.\n    \n- **limit** (integer): The maximum number of books to return per page.\n    \n- **sort** (string): The order in which to sort the results (e.g., ascending or descending).\n    \n- **minPrice** (integer): The minimum price of books to include in the results.\n    \n- **maxPrice** (integer): The maximum price of books to include in the results.\n    \n\n#### Expected Response\n\n- **Status**: 200 OK\n    \n- **Content-Type**: application/json\n    \n\nThe response will include a success indicator and a data object containing the following:\n\n#### Response\n\n#### Example Response\n\n- Success\n    \n\n``` json\n{\n  \"sucess\": \"true\",\n  \"data\":{\n      \"docs\":[],\n      \"totalDocs\":100,\n      \"limit\":25,\n      \"page\":1,\n      \"totalPages\":4\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "My Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/api/v1/books/my-books?paginated=true&categoryId=1",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books",
+								"my-books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "habits",
+									"disabled": true
+								},
+								{
+									"key": "paginated",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "21",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "minPrice",
+									"value": "50",
+									"disabled": true
+								},
+								{
+									"key": "maxPrice",
+									"value": "3350",
+									"disabled": true
+								},
+								{
+									"key": "categoryId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "## Get My Books Only\n\nThis endpoint retrieves a list of books that belong to the authenticated user. It provides details about each book, including its title, price, author, category, and associated tags.\n\n### Request\n\n- **Method:** GET\n    \n- **URL:** `{{localhost}}/api/v1/books/my-books`\n    \n\n### Response\n\n- **Status Code:** 200 OK\n    \n- **Content-Type:** application/json\n    \n\n#### Response Structure\n\nThe response will contain a JSON object with the following structure:\n\n``` json\n{\n  \"sucess\": \"true\",\n  \"data\":{\n      \"docs\":[],\n      \"totalDocs\":100,\n      \"limit\":25,\n      \"page\":1,\n      \"totalPages\":4\n  }\n}\n\n ```\n\n- **success**: A boolean indicating whether the request was successful.\n    \n- **data**: An object containing:\n    \n    - **docs**: An array of book objects. Each book object includes:\n        \n        - **id**: The unique identifier for the book.\n            \n        - **title**: The title of the book.\n            \n        - **price**: The price of the book.\n            \n        - **thumbnail**: A URL or path to the book's thumbnail image (if available).\n            \n        - **author**: The author of the book.\n            \n        - **category**: The category under which the book is classified.\n            \n        - **tags**: An array of tags associated with the book, where each tag includes:\n            \n            - **id**: The unique identifier for the tag.\n                \n            - **name**: The name of the tag.\n                \n    - **totalDocs**: The total number of books returned in the response.  \n          \n          \n        if not authenticated\n        \n\n``` json\n{\n    \"success\": false,\n    \"error\": \"Invalid or expired access token\"\n}\n\n ```\n\nUsage\n\nTo use this endpoint effectively, ensure that you are authenticated and have the necessary permissions to access your book list. The response will provide all relevant details about your books, which can be useful for displaying or managing your collection."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/api/v1/books/:bookId",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"books",
+								":bookId"
+							],
+							"variable": [
+								{
+									"key": "bookId",
+									"value": "13"
+								}
+							]
+						},
+						"description": "### DELETE /api/v1/books/:bookId\n\nThis endpoint is used to delete a specific book from the system based on the provided `bookId`.\n\n#### Request Parameters\n\n- `bookId` (path parameter): The unique identifier of the book that you wish to delete. This parameter is required.\n    \n\n#### Response Structure\n\nThe response will return a JSON object indicating the success of the operation. The structure of the response is as follows:\n\n- `success` (boolean): Indicates whether the deletion was successful.\n    \n- message (string) : Book deleted successfully\n    \n- `error` (string): Contains any error message if applicable;\n    \n\n#### Example Response\n\n``` json\n{\n  \"success\": true,\n  \"message\":\"Book deleted successfully\"\n}\n\n ```\n\n#### Notes\n\nA successful deletion will return a `404` status if the specified `bookId` does not exist in the system."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Home \"multi-language\"",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "ar",
+						"description": "ar | en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{localhost}}",
+					"host": [
+						"{{localhost}}"
+					]
+				},
+				"description": "# Multi-Language Support Test Endpoint\n\nThis endpoint is designed to test multi-language support by utilizing the `Accept-Language` header in the HTTP GET request.\n\n## Request\n\n- **Method**: GET\n    \n- **URL**: `{{localhost}}`\n    \n\n### Headers\n\n- **Accept-Language**: This header should be included in the request to specify the preferred language for the response. **\\[ ar , en \\]**\n    \n\n## Response\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"\"\n}\n\n ```\n\nThis endpoint allows developers to verify that the application correctly interprets the `Accept-Language` header and returns appropriate responses based on the specified language preferences."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{vault:authorization-secret}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
