@@ -26,7 +26,7 @@ export const users = pgTable('users', {
 // Categories
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 100 }).notNull(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
   description: text('description'),
 });
 
@@ -63,8 +63,9 @@ export const books = pgTable(
     updatedAt: timestamp('updated_at').defaultNow(),
   },
   (t) => [
-    index('idx_books_category_id').on(t.categoryId),
     index('idx_books_owner_id').on(t.ownerId),
+    index('idx_books_created_at').on(t.createdAt),
+    index('idx_books_category_id').on(t.categoryId),
   ],
 );
 
