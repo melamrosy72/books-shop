@@ -16,7 +16,13 @@ const app = new Hono();
 
 // Middlewares
 app.use('*', logger());
-app.use('*', cors());
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowHeaders: ['Authorization', 'Content-Type'],
+  }),
+);
 app.use(secureHeaders());
 app.use('/uploads/*', serveStatic({ root: './' }));
 app.use('/paths-to-be-protected/', csrf());

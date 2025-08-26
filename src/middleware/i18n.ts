@@ -11,9 +11,11 @@ import en from '../locales/en/en.json' with { type: 'json' };
 const i18nMiddleware = defineI18nMiddleware({
   // detect language
   locale: detectLocaleFromAcceptLanguageHeader,
+  fallbackLocale: 'en',
   // locales
   messages: {
     en,
+    'en-US': en,
     ar,
   },
 });
