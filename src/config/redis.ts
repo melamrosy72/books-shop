@@ -1,10 +1,8 @@
 import 'dotenv/config';
 import { Redis } from 'ioredis';
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-});
+const isProd = process.env.NODE_ENV === 'production';
+const redis = isProd ? new Redis(process.env.REDIS_URL!) : new Redis();
 
 redis.on('connect', () => {
   console.log('Connected to Redis');
